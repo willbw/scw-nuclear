@@ -5,15 +5,16 @@
 </head>
 <body>
   <% include ../partials/header %>
-  <form action="/action" method="POST">
-    <select id="reactor">
+  <form method="POST" action="/action">
+    <select name="reactor" required>
+      <option disabled selected value> -- select an option -- </option>
       <%for (let i = 0; i < reactors.length; i++){
         %><option value="<%= reactors[i] %>" ><%= reactors[i] %></option><%
       }%>
     </select>
-    <button type="submit" name="start">Start</button>
-    <button type="submit" name="shutdown">Shut Down</button>
-    <button type="submit" name="suspend">Suspend</button>
+    <button type="submit" name="action" value="start">Start</button>
+    <button type="submit" name="action" value="shutdown">Shut Down</button>
+    <button type="submit" name="action" value="suspend">Suspend</button>
   </form>
   <section>
     <% if (typeof errors == 'undefined') { %>

@@ -8,7 +8,8 @@ const session = require('express-session')
 const exec = require('child_process').exec
 var db
 
-let title = ""
+// List of valid reactors
+const reactors = ["Reactor 1", "Reactor 2", "Reactor 3"]
 
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(session({secret: 'top secret stuff!', resave: false, saveUninitialized: true}))
@@ -56,12 +57,15 @@ app.get('/home', (req, res) => {
 
 app.get('/control', (req, res) => {
   let title = "Control Panel"
-  const reactors = ["Reactor 1", "Reactor 2", "Reactor 3"]
-  console.log(reactors)
   res.render('control.ejs', {reactors: reactors, title: title})
 })
 
-app.get('/action', (req, res) => {
-  exec('controlPanel.bat --action ' + action + ' --reactor ' + reactor)
+app.post('/action', (req, res) => {
+  console.log(req.body)
+  let action = req.body.action
+  let reactor = req.body.reactor
 
+  console.log('Action is ' + action + ', reactor is ' + reactor) 
+  // exec('controlPanel.bat --action ' + action + ' --reactor ' + reactor)
+  res.redirect('/control')
 })
