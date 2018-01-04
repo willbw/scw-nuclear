@@ -8,13 +8,21 @@ const session = require('express-session')
 const exec = require('child_process').exec
 var db
 
-// List of valid reactors
+// List of valid reactors and actions
 const reactors = ["Reactor 1", "Reactor 2", "Reactor 3"]
+const actions = ["start", "shutdown", "suspend"]
 
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(session({secret: 'top secret stuff!', resave: false, saveUninitialized: true}))
 app.set('view engine', 'ejs')
+// Makes user variable available to all templates
+app.use((req, res, next) => {
+  res.locals.user = req.session.user
+  next()
+})
 
+// Database containing data about administrators / the power plant
+// Initiallity believed this would be required - seems not to be 
 MongoClient.connect('mongodb://test:9AFjgVXYiJTmiirp@ds239587.mlab.com:39587/power-plant', (err, client) => {
   if (err) return console.log(err)
   db = client.db('power-plant')
@@ -24,6 +32,7 @@ MongoClient.connect('mongodb://test:9AFjgVXYiJTmiirp@ds239587.mlab.com:39587/pow
 })
 
 app.get('/', (req, res) => {
+  console.log(req.session)
   if (req.session.user)
     res.redirect('/home')
   else
@@ -50,7 +59,7 @@ app.post('/auth', (req, res) => {
 app.get('/home', (req, res) => {
   let title = "Home"
   if (req.session.user)
-    res.render('home.ejs', {user : req.session.user, title: title})
+    res.render('home.ejs', {title: title})
   else
     res.send('Not authorised')
 })
@@ -61,11 +70,16 @@ app.get('/control', (req, res) => {
 })
 
 app.post('/action', (req, res) => {
-  console.log(req.body)
   let action = req.body.action
   let reactor = req.body.reactor
+  let title = "Control Panel"
 
-  console.log('Action is ' + action + ', reactor is ' + reactor) 
-  // exec('controlPanel.bat --action ' + action + ' --reactor ' + reactor)
-  res.redirect('/control')
+  if(reactors.indexOf(reactor) > -1 && actions.indexOf(action) > -1) {
+    // exec('controlPanel.bat --action ' + action + ' --reactor ' + reactor)
+    console.log('controlPanel.bat --action ' + action + ' --reactor ' + reactor)
+    let title = "Control Panel"
+    res.render('control.ejs', {reactors: reactors, title: title, messages: action + ' completed on ' + reactor})
+  } else {
+    res.send('Command not accepted.')
+  }
 })

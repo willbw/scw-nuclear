@@ -7,7 +7,7 @@
   <% include ../partials/header %>
   <form method="POST" action="/action">
     <select name="reactor" required>
-      <option disabled selected value> -- select an option -- </option>
+      <option disabled selected value> - select a reactor - </option>
       <%for (let i = 0; i < reactors.length; i++){
         %><option value="<%= reactors[i] %>" ><%= reactors[i] %></option><%
       }%>
@@ -17,10 +17,9 @@
     <button type="submit" name="action" value="suspend">Suspend</button>
   </form>
   <section>
-    <% if (typeof errors == 'undefined') { %>
-      no errors
+    <% if (typeof messages == 'undefined') { %>
       <% } else { %>
-        errors
+        <p style="text-transform: capitalize"><%= messages %></p>
       <% } %>
   </section>
   <% include ../partials/footer %>
