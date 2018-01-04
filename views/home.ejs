@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <% include ../partials/head %>
+</head>
+<body>
+  <% include ../partials/header %>
+  <p>Welcome <%= user %></p>
+  <p>This app allows you to control the life cycle of the nuclear reactors and retrieve its status report</p>
+  <form action="/control" method="GET">
+    <button type="submit" value="control">Control Panel</button>
+    <button type="submit" value="report">Status Report</button>
+  </form>
+  <% include ../partials/footer %>
+</body>
+</html>
