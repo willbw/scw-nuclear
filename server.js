@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 })
 
 // Database containing data about administrators / the power plant
-// Initiallity believed this would be required - seems not to be 
+// Initiallity believed this would be required - currently just stores username and password
 MongoClient.connect('mongodb://test:9AFjgVXYiJTmiirp@ds239587.mlab.com:39587/power-plant', (err, client) => {
   if (err) return console.log(err)
   db = client.db('power-plant')
@@ -31,6 +31,9 @@ MongoClient.connect('mongodb://test:9AFjgVXYiJTmiirp@ds239587.mlab.com:39587/pow
   })
 })
 
+// Index
+// If user not logged in, redirect to login page
+// else send user to the home page
 app.get('/', (req, res) => {
   console.log(req.session)
   if (req.session.user)
@@ -39,23 +42,33 @@ app.get('/', (req, res) => {
     res.redirect('/login')
 })
 
+// Login
 app.get('/login', (req, res) => {
   let title = "Login"
   res.render('login.ejs', { title: title })
 })
 
+// Authorising login
 app.post('/auth', (req, res) => {
-  db.collection('admins').findOne({ user: req.body.user }, function(err, result) {
+  // Santise input from starting with $
+  if (req.body.user.trimLeft().startsWith('$') || req.body.password.trimLeft().startsWith('$')) {
+      res.send('No way, Jose.')
+      return
+  }
+  // Try and find user in admins database and see if the password provided matches
+  db.collection('admins').findOne({ user: req.body.user }, (err, result) => {
     if (err) return console.log(err) 
     if (result.password === req.body.password) {
       req.session.user = req.body.user
       res.redirect('/home')
-    }
-    else
+    } else {
       res.send('Invalid Login.')
+      return
+    }
   })
 })
 
+// Home page
 app.get('/home', (req, res) => {
   let title = "Home"
   if (req.session.user)
@@ -64,17 +77,22 @@ app.get('/home', (req, res) => {
     res.send('Not authorised')
 })
 
+// Control Panel
 app.get('/control', (req, res) => {
   let title = "Control Panel"
   res.render('control.ejs', {reactors: reactors, title: title})
 })
 
+// Processing actions
 app.post('/action', (req, res) => {
   let action = req.body.action
   let reactor = req.body.reactor
   let title = "Control Panel"
 
+  // Check that the reactor is in our list or reactors, and the action is in our
+  // list of actions (that it has an index in the array)
   if(reactors.indexOf(reactor) > -1 && actions.indexOf(action) > -1) {
+    // currently just console.log the output - not actually attempting to execute
     // exec('controlPanel.bat --action ' + action + ' --reactor ' + reactor)
     console.log('controlPanel.bat --action ' + action + ' --reactor ' + reactor)
     let title = "Control Panel"
