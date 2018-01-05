@@ -6,6 +6,7 @@ const app = express()
 const MongoClient = require('mongodb').MongoClient
 const session = require('express-session')
 const exec = require('child_process').exec
+const PORT = process.env.PORT || 3000
 var db
 
 // List of valid reactors and actions
@@ -26,7 +27,7 @@ app.use((req, res, next) => {
 MongoClient.connect('mongodb://test:9AFjgVXYiJTmiirp@ds239587.mlab.com:39587/power-plant', (err, client) => {
   if (err) return console.log(err)
   db = client.db('power-plant')
-  app.listen(3000, () => {
+  app.listen(PORT, () => {
     console.log('listening on 3000')
   })
 })
