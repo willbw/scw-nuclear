@@ -9,12 +9,14 @@ const exec = require('child_process').exec
 const PORT = process.env.PORT || 3000
 var db
 
-// List of valid reactors and actions
-const reactors = ["Reactor 1", "Reactor 2", "Reactor 3"]
-const actions = ["start", "shutdown", "suspend"]
+// List of valid reactors, actions and files
+const reactors = ['Reactor 1', 'Reactor 2', 'Reactor 3']
+const actions = ['start', 'shutdown', 'suspend']
+const files = ['report_1.txt', 'report_2.txt', 'report_3.txt']
 
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(session({secret: 'top secret stuff!', resave: false, saveUninitialized: true}))
+app.use(express.static('public'))
 app.set('view engine', 'ejs')
 // Makes user variable available to all templates
 app.use((req, res, next) => {
@@ -45,7 +47,7 @@ app.get('/', (req, res) => {
 
 // Login
 app.get('/login', (req, res) => {
-  let title = "Login"
+  let title = 'Login'
   res.render('login.ejs', { title: title })
 })
 
@@ -80,15 +82,23 @@ app.get('/home', (req, res) => {
 
 // Control Panel
 app.get('/control', (req, res) => {
-  let title = "Control Panel"
+  if (!req.session.user) {
+    res.send('Access denied')
+    return
+  }
+  let title = 'Control Panel'
   res.render('control.ejs', {reactors: reactors, title: title})
 })
 
 // Processing actions
 app.post('/action', (req, res) => {
+  if (!req.session.user) {
+    res.send('Access denied')
+    return
+  }
   let action = req.body.action
   let reactor = req.body.reactor
-  let title = "Control Panel"
+  let title = 'Control Panel'
 
   // Check that the reactor is in our list or reactors, and the action is in our
   // list of actions (that it has an index in the array)
@@ -117,4 +127,13 @@ app.post('/action', (req, res) => {
   } else {
     res.send('Command not accepted.')
   }
+})
+
+app.get('/reports', (req, res) => {
+  if (!req.session.user) {
+    res.send('Access denied')
+    return
+  }
+  let title = 'Reports'
+  res.render('reports.ejs', {files: files, title: title})
 })

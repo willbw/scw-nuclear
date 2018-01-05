@@ -9,7 +9,9 @@
   <p>This app allows you to control the life cycle of the nuclear reactors and retrieve its status report</p>
   <form action="/control" method="GET">
     <button type="submit" value="control">Control Panel</button>
-    <button type="submit" value="report">Status Report</button>
+  </form>
+  <form action="/reports" method="GET">
+    <button type="submit" value="reports">Status Reports</button>
   </form>
   <% include ../partials/footer %>
 </body>
