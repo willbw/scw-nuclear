@@ -78,7 +78,23 @@ app.post('/action', (req, res) => {
     // exec('controlPanel.bat --action ' + action + ' --reactor ' + reactor)
     console.log('controlPanel.bat --action ' + action + ' --reactor ' + reactor)
     let title = "Control Panel"
-    res.render('control.ejs', {reactors: reactors, title: title, messages: action + ' completed on ' + reactor})
+    var message
+
+    switch(action) {
+      case 'start': {
+        message = 'Startup sequence commenced on ' + reactor
+        break
+      }
+      case 'shutdown': {
+        message = 'Shutdown sequence commenced on ' + reactor
+        break
+      }
+      case 'suspend': {
+        message = 'Power generation activity suspended on ' + reactor
+        break
+      }
+    }
+    res.render('control.ejs', {reactors: reactors, title: title, messages: message})
   } else {
     res.send('Command not accepted.')
   }
