@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <% include ../partials/head %>
+</head>
+<body>
+  <% include ../partials/header %>
+  <form>
+    <label>Username</label>
+    <input type="text" required>
+    <button type="button">Retrieve Password</button>
+  </form> 
+  <div></div>
+  <% include ../partials/footer %>
+</body>
+<script>
+  $(document).ready(function(){
+    $("button").click(function(){
+      $.post("/test", {user: $("input").val()}, function(data){
+        $("div").text(data)
+      })
+    })
+  })
+</script>
+</html>

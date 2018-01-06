@@ -137,3 +137,13 @@ app.get('/reports', (req, res) => {
   let title = 'Reports'
   res.render('reports.ejs', {files: files, title: title})
 })
+
+app.get('/forgot', (req, res) => {
+  let title = 'Forgotten Password'
+  res.render('forgot.ejs', {title: title})
+})
+
+app.post('/test', (req, res) => {
+  console.log(req.body)
+  res.send('william')
+})
