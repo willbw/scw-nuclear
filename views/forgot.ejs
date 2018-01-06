@@ -15,11 +15,15 @@
 </body>
 <script>
   $(document).ready(function(){
-    $("button").click(function(){
+    $("form").submit(function(){
       $.post("/test", {user: $("input").val()}, function(data){
-        $("div").text(data)
+        display_message(data)
       })
+      return false
     })
+    function display_message(data){
+      $("div").html(data)
+    }
   })
 </script>
 </html>
