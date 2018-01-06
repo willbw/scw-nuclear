@@ -14,6 +14,7 @@ const reactors = ['Reactor 1', 'Reactor 2', 'Reactor 3']
 const actions = ['start', 'shutdown', 'suspend']
 const files = ['report_1.txt', 'report_2.txt', 'report_3.txt']
 const loginAttempts = {}
+const MAX_ATTEMPTS = 3
 
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(session({secret: 'top secret stuff!', resave: false, saveUninitialized: true}))
@@ -154,21 +155,32 @@ app.post('/test', (req, res) => {
   db.collection('admins').findOne({ user: user }, (err, result) => {
     if (err) return console.log(err) 
     if (result) {
-      if (typeof loginAttempts[user] == "undefined")
-        loginAttempts[user] = 1
-      else 
-        loginAttempts[user]++
-      if (loginAttempts[user] > 3){
-        // Maximum number of attempts
-        console.log('Maximum number of resets exceeded - will not send password reset')
-        res.send('Maximum number of password resets exceeded.')
-        return
-      } else {
-        // Reset the password - NOTE email not being actually sent
-        console.log('Password reset sent for user: ' + user)
-        res.send('Please check your email to reset your password.')
-        return
+      if (typeof loginAttempts[user] == "undefined"){
+        loginAttempts[user] = {attempts: 1, lastAttempt: Date.now()}
+        console.log(loginAttempts[user])
       }
+      else {
+        if (loginAttempts[user].attempts >= MAX_ATTEMPTS){
+          // if (Date.now() - loginAttempts[user].lastAttempt < 10800 * 1000){
+          if (Date.now() - loginAttempts[user].lastAttempt < 10 * 1000){
+            console.log('Maximum number of resets exceeded - will not send password reset')
+            res.send('Maximum number of password resets exceeded.')
+            console.log(loginAttempts[user])
+            return
+          } else {
+            loginAttempts[user] = {attempts: 0, lastAttempt: Date.now()} 
+            console.log(loginAttempts[user])
+          }
+        } else{
+          loginAttempts[user].attempts++
+          loginAttempts[user].lastAttempt = Date.now()
+          console.log(loginAttempts[user])
+        }
+
+      } 
+      console.log('Password reset sent for user: ' + user)
+      res.send('Please check your email to reset your password.')
+      return
     } else {
       res.send('Unable to process forgotten password.')
       return
